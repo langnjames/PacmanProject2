@@ -69,14 +69,35 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        successorGameState = currentGameState.generatePacmanSuccessor(action) #outputs a grid of all state locations (score only impacted by time currently)
+        newPos = successorGameState.getPacmanPosition() #returns tuple of (x, y) values
+        newFood = successorGameState.getFood() #returns grid that has T/F values for where dots are located
+        newGhostStates = successorGameState.getGhostStates() #returns object (look into what I could possibly do with this)
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates] #returns 0 for now since there are no capsules to eat/eaten
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        
+        score = successorGameState.getScore()
+        #things that could improve evaluationFunction
+        # 1. increased score for being closer to a pellet
+        foodDistance = [manhattanDistance (newPos, food) for food in newFood.asList()]
+        if foodDistance:
+            score += 1 / min(foodDistance)
+        # 2. decreased score for being closer to a ghost
+        ghostDistance = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
+        if ghostDistance:
+            if min(ghostDistance) < 2:
+                score -= 100
+            else:
+                score += 1 / min(ghostDistance)
+        # 3. increased score for being closer to a capsule/ghosts are scared
+        
+
+        print("Successor score: ", successorGameState.getScore())
+        print("EVAL score: ", score)
+
+        #return statement (don't touch for now) 
+        return score
 
 
 def scoreEvaluationFunction(currentGameState):
