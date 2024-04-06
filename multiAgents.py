@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from cmath import inf
 import random
 
 import util
@@ -102,6 +103,7 @@ class ReflexAgent(Agent):
 
 def scoreEvaluationFunction(currentGameState):
     """
+    
     This default evaluation function just returns the score of the state.
     The score is the same one displayed in the Pacman GUI.
 
@@ -137,6 +139,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+    
+
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
@@ -161,6 +165,47 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+
+        # Reqs for minimax algorithm:
+            # any number of ghosts
+            # multiple min layers per max layer (one min layer for each ghost)
+            # expand to arbitrary depth
+            # score minimax leaves with self.eval
+            # single search ply is pacman move and ghost' responses 
+                # (in game theory) the number of levels at which branching occurs in a tree of possible outcomes, typically corresponding to the number of moves ahead (in chess strictly half-moves ahead) considered by a computer program.
+        def minimax(agentIndex, depth, gameState):
+            if gameState.isWin() or gameState.isLose() or depth == self.depth * gameState.getNumAgents():
+                return self.evaluationFunction(gameState), None
+            
+            if agentIndex == 0:
+                return maxAgent(agentIndex, depth, gameState)
+            else: 
+                return minAgent(agentIndex, depth, gameState)
+        
+    
+        def maxAgent(agentIndex, depth, gameState):
+            maxScore = float(-inf)
+            maxAction = None
+            for action in gameState.getLegalActions(agentIndex):
+                nextGameState = gameState.generateSuccessor(agentIndex, action)
+                score, _ = minimax((agentIndex + 1) % gameState.getNumAgents(), depth + 1, nextGameState)
+                if score > maxScore:
+                    maxScore, maxAction = score, action
+            return maxScore, maxAction
+
+        def minAgent(agentIndex, depth, gameState):
+            minScore = float(inf)
+            minAction = None
+            for action in gameState.getLegalActions(agentIndex):
+                nextGameState = gameState.generateSuccessor(agentIndex, action)
+                score, _ = minimax((agentIndex + 1) % gameState.getNumAgents(), depth + 1, nextGameState)
+                if score < minScore:
+                    minScore, minAction = score, action
+            return minScore, minAction
+    
+        _ , action = minimax(0, 0, gameState)
+        return action
+
         util.raiseNotDefined()
 
 
